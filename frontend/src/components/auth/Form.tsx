@@ -1,7 +1,6 @@
 import { FC } from 'react';
-// import { useForm } from 'react-hook-form';
-
-interface FormProps {}
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
 
 // Define the type for the fields array
 type Field = {
@@ -21,8 +20,7 @@ interface FormProps {
   schema: any;
 }
 
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+
 
 const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
   const {
@@ -48,6 +46,7 @@ const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
         >
           {field.label}
         </label>
+
         <input
           type={field.type}
           id={field.name}
