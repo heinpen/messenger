@@ -1,11 +1,15 @@
+
 import AuthHeader from '@/components/auth/AuthHeader';
 import AuthLinkWrapper from '@/components/auth/AuthLinkWrapper';
 import AuthLoginFooter from '@/components/auth/AuthLoginFooter';
 import LoginForm from '@/components/auth/LoginForm';
-import type { FC } from 'react';
-interface LoginProps {}
+import type { Metadata } from 'next';
 
-const Login: FC<LoginProps> = ({}) => {
+export const metadata: Metadata = {
+  title: 'Messenger login',
+};
+
+export default function Login() {
   return (
     <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <AuthHeader title="Sign in to your account" />
@@ -24,5 +28,4 @@ const Login: FC<LoginProps> = ({}) => {
       </div>
     </div>
   );
-};
-export default Login;
+}

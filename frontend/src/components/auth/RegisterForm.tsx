@@ -1,3 +1,5 @@
+'use client';
+
 import * as yup from 'yup';
 import Form from './Form';
 

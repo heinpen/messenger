@@ -1,5 +1,7 @@
-import { FC } from 'react';
+'use client';
+
 import { yupResolver } from '@hookform/resolvers/yup';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 
 // Define the type for the fields array
@@ -19,8 +21,6 @@ interface FormProps {
   buttonLabel: string;
   schema: any;
 }
-
-
 
 const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
   const {

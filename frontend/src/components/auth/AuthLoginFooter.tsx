@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 
+import './styles.css';
+
 interface AuthFooterProps {}
 
 const AuthLoginFooter: FC<AuthFooterProps> = ({}) => {
