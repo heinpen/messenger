@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { User } from './user.entity';
+import { RegisterUserDto } from 'src/dto/registration.dto';
 
 @Injectable()
 export class UsersService {
@@ -10,14 +11,24 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  createUser(userData: Partial<User>): Promise<User> {
-    const newUser = this.usersRepository.create(userData);
+  createUser(userData: RegisterUserDto): RegisterUserDto {
+    return this.usersRepository.create(userData);
+  }
 
-    return this.usersRepository.save(newUser);
+  saveUser(user: RegisterUserDto): Promise<User> {
+    return this.usersRepository.save(user);
   }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
+  }
+
+  findOneWithPassword(email: string): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password') // Explicitly include the password field
+      .where('user.email = :email', { email })
+      .getOne();
   }
 
   findOne(username: string): Promise<User | null> {

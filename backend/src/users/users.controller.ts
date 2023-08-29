@@ -15,7 +15,8 @@ export class UsersController {
   @Get()
   async findAllUsers(): Promise<User[]> {
     try {
-      return await this.userService.findAll();
+      const users = await this.userService.findAll();
+      return users;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
