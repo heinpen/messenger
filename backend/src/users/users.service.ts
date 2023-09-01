@@ -31,8 +31,8 @@ export class UsersService {
       .getOne();
   }
 
-  findOne(username: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ username });
+  findOne(key: Record<string, any>): Promise<User | null> {
+    return this.usersRepository.findOneBy(key);
   }
 
   removeOne(id: number): Promise<DeleteResult> {

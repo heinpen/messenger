@@ -25,7 +25,9 @@ export class UsersController {
   @Get('/:username')
   async findUser(@Param() params: any): Promise<User | string> {
     try {
-      const user = await this.userService.findOne(params.username);
+      const user = await this.userService.findOne({
+        username: params.username,
+      });
       return user ? user : 'No user found';
     } catch (error) {
       throw new InternalServerErrorException(error.message);

@@ -8,19 +8,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    AuthModule,
-    UsersModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'postgres', // Set the database type to PostgreSQL
-      host: 'localhost', // Replace with your PostgreSQL server host
-      port: 5432, // Replace with your PostgreSQL server port
-      username: 'postgres', // Replace with your PostgreSQL username
-      password: 'postgres', // Replace with your PostgreSQL password
-      database: 'messenger', // Replace with your PostgreSQL database name
+      type: 'postgres',
+      host: process.env.DATABASE_HOST,
+      port: Number(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
       autoLoadEntities: true,
-      synchronize: true, // Set to false in production (auto-generates the database schema)
+      synchronize: true,
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
