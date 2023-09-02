@@ -1,17 +1,28 @@
 import {
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   Param,
-  Delete,
+  Req,
 } from '@nestjs/common';
 
+import { Public } from 'src/decorators/public.decorator';
 import { UsersService } from 'src/users/users.service';
 import { User } from './user.entity';
+
+interface ProfileRequest extends Request {
+  user: {
+    sub: number;
+    username: string;
+  };
+}
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
+  @Public()
   @Get()
   async findAllUsers(): Promise<User[]> {
     try {
@@ -22,27 +33,25 @@ export class UsersController {
     }
   }
 
+  @Get('/profile')
+  async findProfile(@Req() request: ProfileRequest): Promise<User | null> {
+    const user = await this.userService.findOneById(request.user.sub);
+    return user;
+  }
+
+  @Public()
   @Get('/:username')
   async findUser(@Param() params: any): Promise<User | string> {
-    try {
-      const user = await this.userService.findOne({
-        username: params.username,
-      });
-      return user ? user : 'No user found';
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = await this.userService.findOneByUsername(params.username);
+    console.log(user, 'user');
+    return user ? user : 'No user found';
   }
 
   @Delete('/:id')
   async removeUser(@Param() params: any): Promise<string> {
-    try {
-      const deleteResult = await this.userService.removeOne(params.id);
-      return deleteResult.affected === 1
-        ? 'User deleted successfully'
-        : 'User not found';
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const deleteResult = await this.userService.removeOne(params.id);
+    return deleteResult.affected === 1
+      ? 'User deleted successfully'
+      : 'User not found';
   }
 }

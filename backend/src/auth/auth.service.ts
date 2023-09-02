@@ -3,15 +3,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/user.entity';
-import { RegisterUserDto } from 'src/dto/registration.dto';
-import { LoginUserDto } from 'src/dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshToken } from './refresh-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { LoginUserDto } from 'src/dto/login.dto';
+import { RegisterUserDto } from 'src/dto/registration.dto';
+import { User } from 'src/users/user.entity';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import { RefreshToken } from './refresh-token.entity';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +76,7 @@ export class AuthService {
     const token = await this.tokenRepository.findOneBy({ token: refreshToken });
     if (!token) throw new UnauthorizedException('2');
 
-    const user = await this.usersService.findOne({ id: token.userId });
+    const user = await this.usersService.findOneById(token.userId);
     if (!user) throw new UnauthorizedException('3');
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
@@ -99,7 +99,7 @@ export class AuthService {
         },
         {
           secret: process.env.ACCESS_TOKEN_SECRET,
-          expiresIn: '15m',
+          expiresIn: '5s',
         },
       ),
       this.jwtService.signAsync(

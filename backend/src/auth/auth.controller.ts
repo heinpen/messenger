@@ -1,20 +1,11 @@
-import {
-  Body,
-  Controller,
-  InternalServerErrorException,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseFilters,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/user.entity';
-import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
-import { RegisterUserDto } from 'src/dto/registration.dto';
-import { LoginUserDto } from 'src/dto/login.dto';
+import { Body, Controller, Post, Req, Res, UseFilters } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { Public } from 'src/decorators/public.decorator';
+import { LoginUserDto } from 'src/dto/login.dto';
+import { RegisterUserDto } from 'src/dto/registration.dto';
+import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
+import { UsersService } from 'src/users/users.service';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 @UseFilters(new HttpExceptionFilter())
@@ -24,6 +15,7 @@ export class AuthController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Public()
   @Post('register')
   async registerUser(
     @Body() userData: RegisterUserDto,
@@ -33,6 +25,7 @@ export class AuthController {
     return { message: 'User registered successfully' };
   }
 
+  @Public()
   @Post('login')
   async loginUser(
     @Body() userData: LoginUserDto,
@@ -53,6 +46,7 @@ export class AuthController {
     response.json({ message: 'User logged in successfully' });
   }
 
+  @Public()
   @Post('refresh-token')
   async refreshToken(@Req() req: Request, @Res() response: Response) {
     const refreshToken = req.cookies['REFRESH_TOKEN'];

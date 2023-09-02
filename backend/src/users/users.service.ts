@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RegisterUserDto } from 'src/dto/registration.dto';
 import { DeleteResult, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { RegisterUserDto } from 'src/dto/registration.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,8 +31,16 @@ export class UsersService {
       .getOne();
   }
 
-  findOne(key: Record<string, any>): Promise<User | null> {
-    return this.usersRepository.findOneBy(key);
+  findOneByUsername(username: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ username });
+  }
+
+  findOneById(id: number): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.email') // Explicitly include the email field
+      .where('user.id = :id', { id })
+      .getOne();
   }
 
   removeOne(id: number): Promise<DeleteResult> {
