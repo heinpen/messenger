@@ -2,7 +2,9 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FC } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { LoginFormData } from './LoginForm';
+import { RegistrationFormData } from './RegisterForm';
 
 // Define the type for the fields array
 type Field = {
@@ -11,18 +13,28 @@ type Field = {
   type: string;
 };
 
-type FormData = {
-  [key: string]: string;
-};
-
 interface FormProps {
   fields: Field[];
-  onSubmit: (formData: { [key: string]: string }) => void;
   buttonLabel: string;
   schema: any;
 }
 
-const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
+interface LoginFormProps extends FormProps {
+  onSubmit: (formData: LoginFormData) => void;
+}
+
+interface RegistrationFormProps extends FormProps {
+  onSubmit: (formData: RegistrationFormData) => void;
+}
+
+type CommonFormProps = LoginFormProps | RegistrationFormProps;
+
+const Form: FC<CommonFormProps> = ({
+  fields,
+  onSubmit,
+  buttonLabel,
+  schema,
+}) => {
   const {
     handleSubmit,
     register,
@@ -31,8 +43,8 @@ const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
     resolver: yupResolver(schema),
   });
 
-  const handleFormSubmit = (formData: FormData) => {
-    onSubmit(formData);
+  const handleFormSubmit: SubmitHandler<FieldValues> = (formData) => {
+    onSubmit(formData as LoginFormData | RegistrationFormData);
   };
 
   function createInputField(field: Field) {
@@ -92,6 +104,7 @@ const Form: FC<FormProps> = ({ fields, onSubmit, buttonLabel, schema }) => {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {fields.map(createFormItem)}
+
       <div>
         <button
           type="submit"

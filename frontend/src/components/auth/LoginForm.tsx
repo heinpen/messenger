@@ -1,10 +1,18 @@
 'use client';
 
+import { loginUser } from '@/api/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
+import Alert from '../ui/Alert';
+import Spinner from '../ui/Spinner';
 import Form from './Form';
 
-type FormData = {
-  [key: string]: string;
+export type LoginFormData = {
+  email: string;
+  password: string;
+  remember: boolean;
 };
 
 const emailValidation = {
@@ -25,9 +33,18 @@ const schema = yup.object().shape({
 });
 
 const LoginForm = () => {
-  const handleLoginSubmit = (formData: FormData) => {
-    // Handle login submission here with formData
-    console.log('Login form data:', formData);
+  const router = useRouter();
+  const { trigger, error, isMutating, data, reset } = useSWRMutation(
+    `${process.env.NEXT_PUBLIC_SERVER}/auth/login`,
+    loginUser,
+  );
+
+  useEffect(() => {
+    if (data) router.push('/');
+  }, [data, router]);
+
+  const handleLoginSubmit = (formData: LoginFormData) => {
+    trigger(formData);
   };
 
   const loginFields = [
@@ -39,12 +56,35 @@ const LoginForm = () => {
   const buttonLabel = 'Login';
 
   return (
-    <Form
-      fields={loginFields}
-      onSubmit={handleLoginSubmit}
-      buttonLabel={buttonLabel}
-      schema={schema}
-    />
+    <>
+      {isMutating && (
+        <div className="flex align-center justify-center mb-5">
+          <Spinner />
+        </div>
+      )}
+      {error && !isMutating && (
+        <Alert
+          message={error.message}
+          className={'mb-6'}
+          handleClose={reset}
+          type={'error'}
+        />
+      )}
+      {data && !isMutating && (
+        <Alert
+          message={data.message}
+          className={'mb-6'}
+          handleClose={reset}
+          type={'success'}
+        />
+      )}
+      <Form
+        fields={loginFields}
+        onSubmit={handleLoginSubmit}
+        buttonLabel={buttonLabel}
+        schema={schema}
+      />
+    </>
   );
 };
 
