@@ -66,4 +66,19 @@ export class AuthController {
       .status(200)
       .json({ message: 'Access token refreshed successfully' });
   }
+
+  @Public()
+  @Post('logout')
+  async logout(@Req() req: Request, @Res() response: Response) {
+    const refreshToken = req.cookies['REFRESH_TOKEN'];
+
+    await this.authService.deleteRefreshToken(refreshToken);
+
+    response.clearCookie('ACCESS_TOKEN');
+    response.clearCookie('REFRESH_TOKEN');
+
+    response.json({ message: 'User logged out successfully' });
+  }
 }
+
+

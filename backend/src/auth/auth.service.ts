@@ -41,7 +41,8 @@ export class AuthService {
       user.password,
     );
 
-    if (!isPasswordMatching) throw new UnauthorizedException();
+    if (!isPasswordMatching)
+      throw new UnauthorizedException('Password is wrong');
 
     const { accessToken, refreshToken } = await this.getTokens(
       user.id,
@@ -71,13 +72,14 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string) {
-    if (!refreshToken) throw new UnauthorizedException('1');
+    if (!refreshToken)
+      throw new UnauthorizedException('No refresh token, try to login');
 
     const token = await this.tokenRepository.findOneBy({ token: refreshToken });
-    if (!token) throw new UnauthorizedException('2');
+    if (!token) throw new UnauthorizedException('No token in db');
 
     const user = await this.usersService.findOneById(token.userId);
-    if (!user) throw new UnauthorizedException('3');
+    if (!user) throw new UnauthorizedException();
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await this.getTokens(user.id, user.username);
@@ -88,6 +90,11 @@ export class AuthService {
       newAccessToken,
       newRefreshToken,
     };
+  }
+
+  async deleteRefreshToken(refreshToken: string) {
+    const token = await this.tokenRepository.delete({ token: refreshToken });
+    console.log(token);
   }
 
   private async getTokens(userId: number, username: string) {

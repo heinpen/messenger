@@ -32,6 +32,15 @@ export async function loginUser(url: string, { arg }: { arg: LoginFormData }) {
   return sendRequest(url, options);
 }
 
+export async function logoutUser(url: string) {
+  const options: RequestInit = {
+    method: 'POST',
+    credentials: 'include',
+  };
+
+  return sendRequest(url, options);
+}
+
 export async function registerUser(
   url: string,
   { arg }: { arg: RegistrationFormData },
@@ -44,5 +53,3 @@ export async function registerUser(
 
   return sendRequest(url, options);
 }
-
-

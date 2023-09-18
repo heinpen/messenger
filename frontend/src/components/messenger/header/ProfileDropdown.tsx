@@ -1,20 +1,45 @@
+import { logoutUser } from '@/api/auth';
 import useUser from '@/hooks/useUser';
 import { classNames } from '@/utils';
 import { Menu, Transition } from '@headlessui/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Fragment, type FC } from 'react';
+import { useRouter } from 'next/navigation';
+import { Fragment, useEffect, type FC } from 'react';
+import useSWRMutation from 'swr/mutation';
 
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
   { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: 'auth/login' },
 ];
 
 interface ProfileDropdownProps {}
 
 const ProfileDropdown: FC<ProfileDropdownProps> = ({}) => {
-  const { data, error, isLoading } = useUser();
+  const router = useRouter();
+
+  const {
+    trigger,
+    error: logoutError,
+    data: logoutData,
+  } = useSWRMutation(
+    `${process.env.NEXT_PUBLIC_SERVER}/auth/logout`,
+    logoutUser,
+  );
+
+  const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    trigger();
+  };
+
+  const { data, error: userError, isLoading } = useUser();
+
+  useEffect(() => {
+    if (logoutData) router.push('/auth/login');
+    if (userError) router.push('/auth/login');
+  }, [userError, logoutData, router]);
+
+  console.log(logoutError, logoutData);
 
   return (
     <Menu as="div" className="ml-3 relative">
@@ -60,6 +85,22 @@ const ProfileDropdown: FC<ProfileDropdownProps> = ({}) => {
               )}
             </Menu.Item>
           ))}
+
+          {/* Logout button */}
+          <Menu.Item>
+            {({ active }) => (
+              <Link
+                href={'/auth/login'}
+                className={classNames(
+                  active ? 'bg-gray-100' : '',
+                  'block px-4 py-2 text-sm text-gray-700',
+                )}
+                onClick={handleLogout}
+              >
+                Logout
+              </Link>
+            )}
+          </Menu.Item>
         </Menu.Items>
       </Transition>
     </Menu>

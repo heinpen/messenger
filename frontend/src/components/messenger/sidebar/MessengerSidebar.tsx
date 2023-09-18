@@ -1,18 +1,34 @@
 'use client';
 
-import { navigation } from '@/data';
+import SearchInput from '@/components/ui/SearchInput';
+import Tabs from '@/components/ui/Tabs';
+import { sidebarTabs } from '@/data';
 import useUser from '@/hooks/useUser';
-import { classNames } from '@/utils';
 
-import Image from 'next/image';
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 
 interface MessengerSidebarProps {}
 
-
-
 const MessengerSidebar: FC<MessengerSidebarProps> = ({}) => {
   const { data, error, isLoading } = useUser();
+
+  const [tabs, setTabs] = useState(sidebarTabs);
+
+  const handleTabClick = (id: number) => {
+    setTabs((prev) =>
+      prev.map((tab) => {
+        if (id === tab.id) {
+          return { ...tab, current: true };
+        } else {
+          return { ...tab, current: false };
+        }
+      }),
+    );
+  };
+
+  const handleSearchChange = (query: string) => {
+      
+  }
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
@@ -27,35 +43,21 @@ const MessengerSidebar: FC<MessengerSidebarProps> = ({}) => {
             height={1}
           /> */}
           {data && (
-                <p className="text-gray-300 hover:bg-gray-700 hover:text-white">{data.username}</p>
-              )}
+            <p className="text-gray-300 hover:bg-gray-700 hover:text-white">
+              {data.username}
+            </p>
+          )}
         </div>
         <div className="flex-1 flex flex-col overflow-y-auto">
-          <nav className="flex-1 px-2 py-4 space-y-1">
-            {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
-                )}
-              >
-                <item.icon
-                  className={classNames(
-                    item.current
-                      ? 'text-gray-300'
-                      : 'text-gray-400 group-hover:text-gray-300',
-                    'mr-3 flex-shrink-0 h-6 w-6',
-                  )}
-                  aria-hidden="true"
-                />
-                {item.name}
-              </a>
-            ))}
-          </nav>
+          <div className="px-4 py-4">
+            <Tabs
+              tabs={tabs}
+              className={''}
+              handleClick={handleTabClick}
+            ></Tabs>
+            <SearchInput />
+          </div>
+          <div></div>
         </div>
       </div>
     </div>

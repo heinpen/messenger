@@ -21,10 +21,11 @@ export class AuthGuard implements CanActivate {
     if (isPublic) {
       return true;
     }
+
     const request = context.switchToHttp().getRequest();
     const token = request.cookies.ACCESS_TOKEN;
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('token is missing');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -33,7 +34,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('error while verifying token');
     }
     return true;
   }
