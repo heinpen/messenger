@@ -47,7 +47,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('refresh-token')
+  @Post('token/refresh')
   async refreshToken(@Req() req: Request, @Res() response: Response) {
     const refreshToken = req.cookies['REFRESH_TOKEN'];
 
@@ -68,6 +68,15 @@ export class AuthController {
   }
 
   @Public()
+  @Post('token/validate')
+  async validateToken(@Req() req: Request, @Res() response: Response) {
+    const accessToken = req.cookies['ACCESS_TOKEN'];
+    await this.authService.validateToken(accessToken);
+
+    response.json({ message: 'token is valid' });
+  }
+
+  @Public()
   @Post('logout')
   async logout(@Req() req: Request, @Res() response: Response) {
     const refreshToken = req.cookies['REFRESH_TOKEN'];
@@ -77,8 +86,6 @@ export class AuthController {
     response.clearCookie('ACCESS_TOKEN');
     response.clearCookie('REFRESH_TOKEN');
 
-    response.json({ message: 'User logged out successfully' });
+    response.json({ done: true, message: 'User logged out successfully' });
   }
 }
-
-

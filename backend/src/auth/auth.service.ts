@@ -57,20 +57,6 @@ export class AuthService {
     };
   }
 
-  private async saveRefreshToken(
-    refreshToken: string,
-    id: number,
-    tokenId?: number,
-  ) {
-    const refreshTokenEntity = this.tokenRepository.create({
-      id: tokenId,
-      token: refreshToken,
-      userId: id,
-    });
-
-    await this.tokenRepository.save(refreshTokenEntity);
-  }
-
   async refreshToken(refreshToken: string) {
     if (!refreshToken)
       throw new UnauthorizedException('No refresh token, try to login');
@@ -84,7 +70,7 @@ export class AuthService {
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await this.getTokens(user.id, user.username);
 
-    await this.saveRefreshToken(newRefreshToken, user.id, token.id);
+    await this.saveRefreshToken(newRefreshToken, user.id);
 
     return {
       newAccessToken,
@@ -92,9 +78,32 @@ export class AuthService {
     };
   }
 
+  async validateToken(accessToken: string) {
+    if (!accessToken) throw new UnauthorizedException('No access token');
+
+    try {
+      await this.jwtService.verifyAsync(accessToken, {
+        secret: process.env.ACCESS_TOKEN_SECRET,
+      });
+    } catch (e) {
+      throw new UnauthorizedException('Invalid access token');
+    }
+  }
+
   async deleteRefreshToken(refreshToken: string) {
-    const token = await this.tokenRepository.delete({ token: refreshToken });
-    console.log(token);
+    await this.tokenRepository.delete({ token: refreshToken });
+  }
+
+  private async saveRefreshToken(
+    refreshToken: string,
+    userId: number,
+  ) {
+    const refreshTokenEntity = this.tokenRepository.create({
+      token: refreshToken,
+      userId,
+    });
+
+    await this.tokenRepository.save(refreshTokenEntity);
   }
 
   private async getTokens(userId: number, username: string) {

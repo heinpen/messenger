@@ -7,6 +7,6 @@ export const navigation = [
 ];
 
 export const sidebarTabs = [
-  { id: 0, name: 'You chats', current: true },
-  { id: 1, name: 'Find people', current: false },
+  { id: 0, displayName: 'You chats', name: 'chats', current: true },
+  { id: 1, displayName: 'Find people', name: 'people', current: false },
 ];

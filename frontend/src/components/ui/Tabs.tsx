@@ -6,6 +6,7 @@ interface TabsProps {
     name: string;
     current: boolean;
     id: number;
+    displayName: string;
   }[];
   className?: string;
   handleClick: (id: number) => void;
@@ -27,7 +28,7 @@ const Tabs: FC<TabsProps> = ({ tabs, className, handleClick }) => {
           aria-current={tab.current ? 'page' : undefined}
           onClick={() => handleClick(tab.id)}
         >
-          {tab.name}
+          {tab.displayName}
         </button>
       ))}
     </div>

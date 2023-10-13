@@ -3,7 +3,10 @@
 import SearchInput from '@/components/ui/SearchInput';
 import Tabs from '@/components/ui/Tabs';
 import { sidebarTabs } from '@/data';
-import useUser from '@/hooks/useUser';
+import { useDebounce } from '@/hooks';
+import { useGetUsers, useSearchUsers, useUser } from '@/hooks/api';
+import { User } from '@/types';
+import { debounce } from '@/utils';
 
 import { useState, type FC } from 'react';
 
@@ -12,12 +15,40 @@ interface MessengerSidebarProps {}
 const MessengerSidebar: FC<MessengerSidebarProps> = ({}) => {
   const { data, error, isLoading } = useUser();
 
+  const [searchUsersQuery, setSearchUsersQuery] = useState('');
+
+  const [searchChatsQuery, setSearchChatsQuery] = useState('');
+
+  const { data: usersData, error: usersError } = useGetUsers();
+
+
+  const { data: searchUsersData, error: searchUsersError } =
+    useSearchUsers(searchUsersQuery);
+
+  // const { data: searchChatsData, error: searchChatsError } =
+  //   useSearchUsers(searchUsersQuery);
+
   const [tabs, setTabs] = useState(sidebarTabs);
+  const [currentTab, setCurrentTab] = useState<string>(
+    tabs.reduce(
+      (acc, tab) => (tab.current ? tab.name : acc),
+      tabs[0].name as string,
+    ),
+  );
+
+  const handleSearchChange = useDebounce((query: string) => {
+    if (currentTab === 'chats') {
+      setSearchChatsQuery(query);
+    } else {
+      setSearchUsersQuery(query);
+    }
+  }, 500);
 
   const handleTabClick = (id: number) => {
     setTabs((prev) =>
       prev.map((tab) => {
         if (id === tab.id) {
+          setCurrentTab(tab.name);
           return { ...tab, current: true };
         } else {
           return { ...tab, current: false };
@@ -26,9 +57,15 @@ const MessengerSidebar: FC<MessengerSidebarProps> = ({}) => {
     );
   };
 
-  const handleSearchChange = (query: string) => {
-      
-  }
+  // const handleSearchChange = (query: string) => {
+  //   debounce(() => {
+  //     if (currentTab === 'chats') {
+  //       setSearchChatsQuery(query);
+  //     } else {
+  //       setSearchUsersQuery(query);
+  //     }
+  //   }, 500);
+  // };
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
@@ -55,9 +92,18 @@ const MessengerSidebar: FC<MessengerSidebarProps> = ({}) => {
               className={''}
               handleClick={handleTabClick}
             ></Tabs>
-            <SearchInput />
+            <SearchInput changeHandler={handleSearchChange} />
           </div>
-          <div></div>
+          <div className="px-4 py-4">
+            {currentTab === 'chats'
+              ? 'chats'
+              : searchUsersData &&
+                searchUsersData.map((user: User) => (
+                  <div key={user.id}>
+                    <p className='w-20 overflow-ellipsis whitespace-nowrap block overflow-hidden'>{user.username}</p>
+                  </div>
+                ))}
+          </div>
         </div>
       </div>
     </div>

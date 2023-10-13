@@ -1,3 +1,4 @@
+import { hasActiveSession, reactivateSession } from '@/api/server/auth';
 import MessengerHeader from '@/components/messenger/header/MessengerHeader';
 import MessengerMain from '@/components/messenger/main/MessengerMain';
 import MessengerSidebar from '@/components/messenger/sidebar/MessengerSidebar';
@@ -19,7 +20,17 @@ const navigation = [
   { name: 'Reports', href: '#', icon: ChartBarIcon, current: false },
 ];
 
-export default function Messenger() {
+export default async function Messenger() {
+  const isUserLoggedIn = await hasActiveSession();
+  console.log(isUserLoggedIn, 'isUserLoggedIn');
+  if (!isUserLoggedIn) {
+    const { done, message } = await reactivateSession();
+    console.log(done, message, 'done, message');
+    if (!done) {
+      console.log(message);
+    }
+  }
+
   return (
     <>
       <div>

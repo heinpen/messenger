@@ -1,12 +1,10 @@
-import { logoutUser } from '@/api/auth';
-import useUser from '@/hooks/useUser';
+import { useLogoutUser, useUser } from '@/hooks/api';
 import { classNames } from '@/utils';
 import { Menu, Transition } from '@headlessui/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, type FC } from 'react';
-import useSWRMutation from 'swr/mutation';
 
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -18,28 +16,13 @@ interface ProfileDropdownProps {}
 const ProfileDropdown: FC<ProfileDropdownProps> = ({}) => {
   const router = useRouter();
 
-  const {
-    trigger,
-    error: logoutError,
-    data: logoutData,
-  } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_SERVER}/auth/logout`,
-    logoutUser,
-  );
+  const { trigger, error: logoutError, data: logoutData } = useLogoutUser();
 
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    trigger();
-  };
-
-  const { data, error: userError, isLoading } = useUser();
+  const { data, error: userError } = useUser();
 
   useEffect(() => {
-    if (logoutData) router.push('/auth/login');
-    if (userError) router.push('/auth/login');
-  }, [userError, logoutData, router]);
-
-  console.log(logoutError, logoutData);
+    if (logoutData?.done) router.push('/auth/login');
+  }, [logoutData, router]);
 
   return (
     <Menu as="div" className="ml-3 relative">
@@ -89,16 +72,16 @@ const ProfileDropdown: FC<ProfileDropdownProps> = ({}) => {
           {/* Logout button */}
           <Menu.Item>
             {({ active }) => (
-              <Link
-                href={'/auth/login'}
+              <button
+                type="button"
                 className={classNames(
                   active ? 'bg-gray-100' : '',
                   'block px-4 py-2 text-sm text-gray-700',
                 )}
-                onClick={handleLogout}
+                onClick={() => trigger()}
               >
                 Logout
-              </Link>
+              </button>
             )}
           </Menu.Item>
         </Menu.Items>

@@ -19,8 +19,21 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  findAllUsers(id: number): Promise<User[]> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id != :id', { id })
+      .getMany();
+  }
+
+  findUsers(id: number, searchQuery: string): Promise<User[] | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id != :id', { id })
+      .andWhere('user.username LIKE :searchQuery', {
+        searchQuery: `%${searchQuery}%`,
+      })
+      .getMany();
   }
 
   findOneWithPassword(email: string): Promise<User | null> {

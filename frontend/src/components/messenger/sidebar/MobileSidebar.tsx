@@ -1,5 +1,5 @@
 import { navigation } from '@/data';
-import useUser from '@/hooks/useUser';
+import { useUser } from '@/hooks/api';
 import { classNames } from '@/utils';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
